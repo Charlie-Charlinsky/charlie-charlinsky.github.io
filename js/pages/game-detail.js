@@ -23,6 +23,8 @@ const METADATA_LABELS = {
     }
 };
 
+const ACCESS_LINK_LABEL = "Game Page";
+
 function appendMetadataRow(metadata, label, items) {
     const row = createElement("div", { className: "game-detail__meta-row" });
     const value = createElement("dd", { className: "game-detail__meta-value" });
@@ -36,25 +38,32 @@ function metadataValue(value) {
     return value === undefined || value === null || value === "" ? "?" : String(value);
 }
 
-function createGameMetadata(game, language) {
-    const labels = { ...METADATA_LABELS[language], ...game.metadataLabels?.[language] };
-    const metadata = createElement("dl", { className: "game-detail__meta" });
-    const access = game.accessUrl
-        ? createElement("a", {
-            text: game.accessUrl,
+function createAccessLinks(accessValue) {
+    const urls = Array.isArray(accessValue) ? accessValue : [accessValue];
+    const links = urls
+        .filter((url) => typeof url === "string" && url.trim())
+        .map((url) => createElement("a", {
+            className: "game-detail__access-link",
+            text: ACCESS_LINK_LABEL,
             attributes: {
-                href: resolveSiteUrl(game.accessUrl),
+                href: resolveSiteUrl(url),
                 target: "_blank",
                 rel: "noopener noreferrer"
             }
-        })
-        : "?";
+        }));
+    return links.length ? links : ["?"];
+}
+
+function createGameMetadata(game, language) {
+    const labels = { ...METADATA_LABELS[language], ...game.metadataLabels?.[language] };
+    const metadata = createElement("dl", { className: "game-detail__meta" });
+    const accessLinks = createAccessLinks(game.accessUrl);
 
     appendMetadataRow(metadata, labels.year, [metadataValue(game.year)]);
     appendMetadataRow(metadata, labels.company, [metadataValue(game.studio)]);
     appendMetadataRow(metadata, labels.platform, [metadataValue(game.platform)]);
     appendMetadataRow(metadata, labels.engine, [metadataValue(game.engineName)]);
-    appendMetadataRow(metadata, labels.access, [access]);
+    appendMetadataRow(metadata, labels.access, accessLinks);
     return metadata;
 }
 
@@ -75,6 +84,11 @@ function createGameNavigation(games, currentIndex, language) {
             className: "back-link game-detail__navigation-link",
             text: language === "es" ? "Siguiente →" : "Next →",
             attributes: { href: detailUrl(language, "games", next.id) }
+        }),
+        createElement("a", {
+            className: "back-link game-detail__navigation-link",
+            text: "Home",
+            attributes: { href: resolveRoute(language, "games") }
         })
     );
     return navigation;

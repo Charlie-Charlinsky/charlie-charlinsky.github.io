@@ -828,6 +828,23 @@ body[data-page="game-detail"] .page-shell {
     overflow-wrap: anywhere;
 }
 
+.game-detail__access-link,
+.game-detail__access-link:visited {
+    color: #9CDCFE;
+    text-decoration: underline;
+}
+
+.game-detail__access-link:hover,
+.game-detail__access-link:focus-visible {
+    color: #C7E9FF;
+    text-decoration: underline;
+}
+
+.game-detail__access-link:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 4px;
+}
+
 .game-detail__body {
     display: grid;
     grid-template-columns: minmax(20rem, 0.86fr) minmax(0, 1.14fr);
