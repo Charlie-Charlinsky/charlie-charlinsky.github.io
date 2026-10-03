@@ -119,6 +119,28 @@ obsoleteEnginePresentationTokens.forEach((token) => {
 if (!gameDetailSource.includes("createGameNavigation(orderedGames, currentIndex, language)")) {
     fail("Game Detail: navegación Previous/Next no resuelta");
 }
+const gameNavigationTargets = [
+    'detailUrl(language, "games", previous.id)',
+    'detailUrl(language, "games", next.id)',
+    'resolveRoute(language, "games")'
+];
+const gameNavigationIndexes = gameNavigationTargets.map((token) => gameDetailSource.indexOf(token));
+if (gameNavigationIndexes.some((index) => index < 0)
+    || gameNavigationIndexes.some((index, position) => position > 0 && index <= gameNavigationIndexes[position - 1])) {
+    fail("Game Detail: Home must follow Next and resolve to the localized games listing");
+}
+if (!gameDetailSource.includes('const ACCESS_LINK_LABEL = "Game Page";')
+    || !gameDetailSource.includes('className: "game-detail__access-link"')
+    || !gameDetailSource.includes('href: resolveSiteUrl(url)')
+    || !gameDetailSource.includes('target: "_blank"')
+    || !gameDetailSource.includes('rel: "noopener noreferrer"')) {
+    fail("Game Detail: Access label, destination, or external-link behavior is unresolved");
+}
+if (!/\.game-detail__access-link,\s*\.game-detail__access-link:visited\s*\{[^}]*color:\s*#9CDCFE;[^}]*text-decoration:\s*underline;/s.test(frontendCss)
+    || !/\.game-detail__access-link:hover,\s*\.game-detail__access-link:focus-visible\s*\{[^}]*color:\s*#C7E9FF;[^}]*text-decoration:\s*underline;/s.test(frontendCss)
+    || !/\.game-detail__access-link:focus-visible\s*\{[^}]*outline:\s*var\(--focus-ring\);[^}]*outline-offset:\s*4px;/s.test(frontendCss)) {
+    fail("Game Detail: Access normal, visited, hover, and focus styles are unresolved");
+}
 if (!gameDetailSource.includes("createMediaGallery(media")) {
     fail("Game Detail: galería de medios no resuelta");
 }
